@@ -65,43 +65,53 @@ public class PlaceMultipleObjectsOnPlane : MonoBehaviour
 
     void Update()
     {
-        if (Input.touchCount > 0)
+        if (Input.touchCount > 0 && Input.touchCount==1)
         {
             Touch touch = Input.GetTouch(0);
 
            
-           // Ray ray = ARCamera.ScreenPointToRay(new Vector3(touch.position.x, touch.position.y, 0));
-           //RaycastHit hitInfo;
-           // if(Physics.Raycast(ray, out hitInfo, 10))
-            //{
-            //    AROriginText.text = "Ray Intersected With Tag : " + hitInfo.transform.tag;
-            //}
-            //else
-            //{
-            //    AROriginText.text = "Ray Intersection Test Failed";
-            //}
+            Ray ray = ARCamera.ScreenPointToRay(new Vector3(touch.position.x, touch.position.y, 0));
+            
+            RaycastHit hitInfo;
+            if(Physics.Raycast(ray, out hitInfo, 10))
+            {
+                AROriginText.text = "Ray Intersected With Tag : " + hitInfo.transform.tag;
+                // hitInfo.poi
 
-       //     if (touch.phase == TouchPhase.Began)
+                if(hitInfo.transform.tag=="plane")
+                {
+                    
+                    Instantiate(placedPrefab, hitInfo.point, Quaternion.identity);
+
+                }
+               // Instantiate(placedPrefab, hitInfo.point, Quaternion.identity);
+            }
+            else
+            {
+                AROriginText.text = "Ray Intersection Test Failed";
+            }
+
+           if (touch.phase == TouchPhase.Began)
             {
 
             }
         }
 
 
-    //    if (m_SessionOrigin.Raycast(touch.position, Hits, TrackableType.All))
-        {
+       //if (m_SessionOrigin.Raycast(touch.position, Hits, TrackableType.All))
+       // {
 
-         //   Pose hitPose = Hits[0].pose;
+       //     Pose hitPose = Hits[0].pose;
 
-            //     spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
+       //         spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
 
-            if (onPlacedObject != null)
-            {
-            //    onPlacedObject();
+       //     if (onPlacedObject != null)
+       //     {
+       //        onPlacedObject();
 
-            }
-        }
+       //     }
+       // }
 
-        //   AROriginText.text = "ARCamera : " + ARCamera.transform.position.ToString();
+           AROriginText.text = "ARCamera : " + ARCamera.transform.position.ToString();
     }
 }
