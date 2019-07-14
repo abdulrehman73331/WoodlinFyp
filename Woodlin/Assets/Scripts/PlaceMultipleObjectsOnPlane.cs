@@ -12,6 +12,8 @@ public class PlaceMultipleObjectsOnPlane : MonoBehaviour
     [SerializeField]
     [Tooltip("Instantiates this prefab on a plane at the touch location.")]
     GameObject m_PlacedPrefab;
+    static public int T_Count = 0;
+    static int cnt = 0;
 
     // Singleton Code
     private static PlaceMultipleObjectsOnPlane _Instance = null;
@@ -58,6 +60,11 @@ public class PlaceMultipleObjectsOnPlane : MonoBehaviour
 
     static List<ARRaycastHit> Hits = new List<ARRaycastHit>();
 
+    //static List<Pose> trying = new List<Pose>();
+    static Vector3[] trying = new Vector3[3];
+    static int n = 0;
+    static int count = 0;
+
     void Awake()
     {
         m_SessionOrigin = GetComponent<ARSessionOrigin>();
@@ -65,53 +72,90 @@ public class PlaceMultipleObjectsOnPlane : MonoBehaviour
 
     void Update()
     {
-        if (Input.touchCount > 0 && Input.touchCount==1)
+        T_Count = Input.touchCount + T_Count;
+
+        if (T_Count == 1 )
         {
+            //AROriginText.text = T_Count.ToString();
             Touch touch = Input.GetTouch(0);
-
-           
-            Ray ray = ARCamera.ScreenPointToRay(new Vector3(touch.position.x, touch.position.y, 0));
-            
-            RaycastHit hitInfo;
-            if(Physics.Raycast(ray, out hitInfo, 10))
+            if (m_SessionOrigin.Raycast(touch.position, Hits, TrackableType.PlaneWithinPolygon))
             {
-                AROriginText.text = "Ray Intersected With Tag : " + hitInfo.transform.tag;
-                // hitInfo.poi
-
-                if(hitInfo.transform.tag=="plane")
+                
+                Pose hitPose = Hits[0].pose;
+                trying[n] = hitPose.position;
+                n++;
+                for(int i = 0; i < n ; i++)
                 {
-                    
-                    Instantiate(placedPrefab, hitInfo.point, Quaternion.identity);
+                    if (hitPose.position != trying[i] && count > 0 )
+                    {
+                        spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
 
+                        if (onPlacedObject != null)
+                        {
+                            onPlacedObject();
+
+                        }
+                    } 
+                    else if(count == 0)
+                    {
+                        spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
+
+                        if (onPlacedObject != null)
+                        {
+                            onPlacedObject();
+
+                        }
+                    }
+                    count++;
                 }
-               // Instantiate(placedPrefab, hitInfo.point, Quaternion.identity);
-            }
-            else
-            {
-                AROriginText.text = "Ray Intersection Test Failed";
-            }
 
-           if (touch.phase == TouchPhase.Began)
-            {
 
+                
             }
+            AROriginText.text = T_Count.ToString();
+
+            // Ray ray = ARCamera.ScreenPointToRay(new Vector3(touch.position.x, touch.position.y, 0));
+
+            // RaycastHit hitInfo;
+            // if(Physics.Raycast(ray, out hitInfo, 10))
+            // {
+            //     AROriginText.text = "Ray Intersected With Tag : " + hitInfo.transform.tag;
+            //     // hitInfo.poi
+
+            //     if(hitInfo.transform.tag=="plane")
+            //     {
+
+            //         Instantiate(placedPrefab, hitInfo.point, Quaternion.identity);
+
+            //     }
+            //    // Instantiate(placedPrefab, hitInfo.point, Quaternion.identity);
+            // }
+            // else
+            // {
+            //     AROriginText.text = "Ray Intersection Test Failed";
+            // }
+
+            //if (touch.phase == TouchPhase.Began)
+            // {
+
+            // }
         }
 
 
-       //if (m_SessionOrigin.Raycast(touch.position, Hits, TrackableType.All))
-       // {
+        //if (m_SessionOrigin.Raycast(touch.position, Hits, TrackableType.All))
+        // {
 
-       //     Pose hitPose = Hits[0].pose;
+        //     Pose hitPose = Hits[0].pose;
 
-       //         spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
+        //         spawnedObject = Instantiate(m_PlacedPrefab, hitPose.position, hitPose.rotation);
 
-       //     if (onPlacedObject != null)
-       //     {
-       //        onPlacedObject();
+        //     if (onPlacedObject != null)
+        //     {
+        //        onPlacedObject();
 
-       //     }
-       // }
+        //     }
+        // }
 
-           AROriginText.text = "ARCamera : " + ARCamera.transform.position.ToString();
+        AROriginText.text = "ARCamera : " + ARCamera.transform.position.ToString();
     }
 }
